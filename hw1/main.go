@@ -10,7 +10,7 @@ func Sqrt(x float64) float64 {
 	cnt := 0
 	for {
 		cnt++
-		fmt.Println("number of iterations:", cnt, z)
+		fmt.Println("number of iterations:", cnt, z) 
 		if math.Abs(z - z - (z * z - x) / (2 * z)) <= 1e-6 {
 			break
 		}
@@ -20,6 +20,6 @@ func Sqrt(x float64) float64 {
 }
 
 func main() {
-	fmt.Println(Sqrt(800))
-	fmt.Println(math.Sqrt(800))
+	fmt.Println(Sqrt(555))
+	fmt.Println(math.Sqrt(555))
 }
