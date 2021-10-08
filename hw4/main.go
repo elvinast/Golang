@@ -26,9 +26,20 @@ func LoadServer () {
 
 func bmi(w http.ResponseWriter, req *http.Request) {
 	data := dataForBMI{weight: 20, height: 0.8}
-	fmt.Fprintf(w, "%v", GetBMI(data.weight, data.height))
+	myBmi, myResult := GetBMI(data.weight, data.height)
+	fmt.Fprintf(w, "Your body mass index is %v. %v", myBmi, myResult)
+	
 }
 
-func GetBMI(weight float64, height float64) float64 {
-	return weight / math.Pow(height, 2)
+func GetBMI(weight float64, height float64) (float64, string) {
+	bmiRes := weight / math.Pow(height, 2)
+	res := ""
+	if bmiRes < 18.5 {
+		res = "Underweight( Eat more cookies."
+	} else if bmiRes < 24.9 {
+		res = "Everything is okay:)"
+	} else {
+		res = "Overweight( Eat less cookies."
+	}
+	return bmiRes, res
 }
