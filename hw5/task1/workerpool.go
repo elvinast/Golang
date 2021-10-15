@@ -17,17 +17,17 @@ func worker(id int, jobs <-chan int, results chan<- int) {
 func main() {
 	jobsCount := 5
 	workersCount := 3
-    jobs := make(chan int, jobsCount)
-    results := make(chan int, jobsCount)
+	jobs := make(chan int, jobsCount)
+	results := make(chan int, jobsCount)
 
 	for i := 1; i <= workersCount; i++ {
-        go worker(i, jobs, results)
-    }
+	    go worker(i, jobs, results)
+	}
 	for i := 1; i <= jobsCount; i++ {
-        jobs<-i
-    }
+	    jobs<-i
+	}
 	close(jobs)
 	for i := 1; i <= jobsCount; i++ {
-        fmt.Println("\ngot results:", <-results)
+       fmt.Println("\ngot results:", <-results)
     }
 }
