@@ -5,8 +5,8 @@ package main
 import (
 	"fmt"
 	// "testing"
-	"net/http"
 	"math"
+	"net/http"
 )
 
 type dataForBMI struct {
@@ -14,12 +14,12 @@ type dataForBMI struct {
 	height float64
 }
 
-func main () {
+func main() {
 	fmt.Printf("Starting server at port 8080\n")
 	LoadServer()
 }
 
-func LoadServer () {
+func LoadServer() {
 	http.HandleFunc("/", bmi)
 	http.ListenAndServe(":8080", nil)
 }
@@ -28,7 +28,7 @@ func bmi(w http.ResponseWriter, req *http.Request) {
 	data := dataForBMI{weight: 20, height: 0.8}
 	myBmi, myResult := GetBMI(data.weight, data.height)
 	fmt.Fprintf(w, "Your body mass index is %v. %v", myBmi, myResult)
-	
+
 }
 
 func GetBMI(weight float64, height float64) (float64, string) {
