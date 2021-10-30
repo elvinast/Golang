@@ -33,57 +33,111 @@ func NewServer(ctx context.Context, address string, store store.Store) *Server {
 func (s *Server) basicHandler() chi.Router {
 	r := chi.NewRouter()
 
-	// REST
-	// сущность/идентификатор
-	// /electronics/laptops
-	// /electronics/phones
 	r.Post("/products", func(w http.ResponseWriter, r *http.Request) {
-		foodItem := new(models.FoodItem)
-		if err := json.NewDecoder(r.Body).Decode(foodItem); err != nil {
-			fmt.Fprintf(w, "Unknown err: %v", err)
+		product := new(models.Product)
+		if err := json.NewDecoder(r.Body).Decode(product); err != nil {
+			fmt.Fprintf(w, "Post products error: %v", err)
 			return
 		}
-		s.store.Create(r.Context(), foodItem)
+		s.store.Products().Create(r.Context(), product)
 	})
+
 	r.Get("/products", func(w http.ResponseWriter, r *http.Request) {
-		foodItems, err := s.store.All(r.Context())
+		product, err := s.store.Products().All(r.Context())
 		if err != nil {
-			fmt.Fprintf(w, "Unknown err: %v", err)
+			fmt.Fprintf(w, "Get products error: %v", err)
 			return
 		}
-		render.JSON(w, r, foodItems)
+		render.JSON(w, r, product)
 	})
+
 	r.Get("/products/{id}", func(w http.ResponseWriter, r *http.Request) {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			fmt.Fprintf(w, "Unknown err: %v", err)
+			fmt.Fprintf(w, "Get product error: %v", err)
 			return
 		}
-		foodItem, err := s.store.ByID(r.Context(), id)
+		product, err := s.store.Products().ByID(r.Context(), id)
 		if err != nil {
-			fmt.Fprintf(w, "Unknown err: %v", err)
+			fmt.Fprintf(w, "Get product error: %v", err)
 			return
 		}
-		render.JSON(w, r, foodItem)
+		render.JSON(w, r, product)
 	})
+
 	r.Put("/products", func(w http.ResponseWriter, r *http.Request) {
-		foodItem := new(models.FoodItem)
-		if err := json.NewDecoder(r.Body).Decode(foodItem); err != nil {
-			fmt.Fprintf(w, "Unknown err: %v", err)
+		product := new(models.Product)
+		if err := json.NewDecoder(r.Body).Decode(product); err != nil {
+			fmt.Fprintf(w, "Update product error: %v", err)
 			return
 		}
-		s.store.Update(r.Context(), foodItem)
+		s.store.Products().Update(r.Context(), product)
 	})
+
 	r.Delete("/products/{id}", func(w http.ResponseWriter, r *http.Request) {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			fmt.Fprintf(w, "Unknown err: %v", err)
+			fmt.Fprintf(w, "Delete product error: %v", err)
 			return
 		}
-		s.store.Delete(r.Context(), id)
+		s.store.Products().Delete(r.Context(), id)
 	})
+
+
+	r.Post("/users", func(w http.ResponseWriter, r *http.Request) {
+		user := new(models.User)
+		if err := json.NewDecoder(r.Body).Decode(user); err != nil {
+			fmt.Fprintf(w, "Post user error: %v", err)
+			return
+		}
+		s.store.Users().Create(r.Context(), user)
+	})
+
+	r.Get("/users", func(w http.ResponseWriter, r *http.Request) {
+		user, err := s.store.Users().All(r.Context())
+		if err != nil {
+			fmt.Fprintf(w, "Get users error: %v", err)
+			return
+		}
+		render.JSON(w, r, user)
+	})
+
+	r.Get("/users/{id}", func(w http.ResponseWriter, r *http.Request) {
+		idStr := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			fmt.Fprintf(w, "Get user error: %v", err)
+			return
+		}
+		user, err := s.store.Users().ByID(r.Context(), id)
+		if err != nil {
+			fmt.Fprintf(w, "Get user error: %v", err)
+			return
+		}
+		render.JSON(w, r, user)
+	})
+
+	r.Put("/users", func(w http.ResponseWriter, r *http.Request) {
+		user := new(models.User)
+		if err := json.NewDecoder(r.Body).Decode(user); err != nil {
+			fmt.Fprintf(w, "Update user error: %v", err)
+			return
+		}
+		s.store.Users().Update(r.Context(), user)
+	})
+
+	r.Delete("/users/{id}", func(w http.ResponseWriter, r *http.Request) {
+		idStr := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			fmt.Fprintf(w, "Delete user error: %v", err)
+			return
+		}
+		s.store.Users().Delete(r.Context(), id)
+	})
+
 	return r
 }
 
@@ -102,7 +156,7 @@ func (s *Server) Run() error {
 func (s *Server) ListenCtxForGT(srv *http.Server) {
 	<-s.ctx.Done() // блокируемся, пока контекст приложения не отменен
 	if err := srv.Shutdown(context.Background()); err != nil {
-		log.Printf("[HTTP] Got err while shutting down^ %v", err)
+		log.Printf("[HTTP] Got error while shutting down: %v", err)
 	}
 	log.Println("[HTTP] Proccessed all idle connections")
 	close(s.idleConnsCh)
