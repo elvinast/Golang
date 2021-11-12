@@ -1,10 +1,10 @@
 package models
 
 type User struct {
-	ID            int          `gorm:"AUTO_INCREMENT;not null;PRIMARY_KEY" json:"id"`
-	Name          string       `json:"name"`
-	Email  		  string   	   `json:"email"`
-	Address 	  string       `json:"address"`
+	ID            int          `gorm:"AUTO_INCREMENT;not null;PRIMARY_KEY" json:"id"  db:"id"`
+	Name          string       `json:"name" db:"name"`
+	Email  		  string   	   `json:"email" db:"email"`
+	Address 	  string       `json:"address" db:"address"`
 	ShoppingCart  []Product    `json:"cart"`
-	MobilePhone   string       `json:"phone"`
+	MobilePhone   string       `json:"phone" db:"mobilePhone"`
 }
