@@ -1,15 +1,15 @@
 package postgres
 
 import (
-	"github.com/jackc/pgx/stdlib"
-	"github.com/jmoiron/sqlx"
 	"Go/hw6/internal/store"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/jackc/pgx/stdlib"
 )
 
 type DB struct {
 	conn *sqlx.DB
 
-	products      store.ProductRepository
+	products store.ProductRepository
 	profile store.UserRepository
 }
 
@@ -33,4 +33,5 @@ func (db *DB) Connect(url string) error {
 
 func (db *DB) Close() error {
 	return db.conn.Close()
+
 }

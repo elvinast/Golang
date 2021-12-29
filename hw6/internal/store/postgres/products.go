@@ -1,13 +1,15 @@
 package postgres
 
 import (
-	"context"
-	"github.com/jmoiron/sqlx"
 	"Go/hw6/internal/models"
 	"Go/hw6/internal/store"
+	"context"
+	"fmt"
+
+	"github.com/jmoiron/sqlx"
 )
 
-func (db *DB) Categories() store.ProductRepository {
+func (db *DB) Products() store.ProductRepository {
 	if db.products == nil {
 		db.products = NewProductsRep(db.conn)
 	}
@@ -23,17 +25,23 @@ func NewProductsRep(conn *sqlx.DB) store.ProductRepository {
 }
 
 func (c ProductRepository) Create(ctx context.Context, product *models.Product) error {
-	_, err := c.conn.Exec("INSERT INTO products(title) VALUES ($1)", product.Title)
+	_, err := c.conn.Exec("INSERT INTO products(id, title, description, price, isavailable, weight) VALUES ($1, $2, $3, $4, $5, $6)", product.ID, product.Title, product.Description, product.Price, product.IsAvailable, product.Weight)
 	if err != nil {
+		fmt.Println(err)
 		return err
+	} else {
+		fmt.Printf("Success\n")
 	}
-
 	return nil
 }
 
-func (c ProductRepository) All(ctx context.Context) ([]*models.Product, error) {
+func (c ProductRepository) All(ctx context.Context, filter *models.ProductFilter) ([]*models.Product, error) {
+	basicQuery := "SELECT * FROM products"
+	if filter.Query != nil {
+		basicQuery += " WHERE title ilike '%" + *filter.Query + "%'"
+	}
 	products := make([]*models.Product, 0)
-	if err := c.conn.Select(&products, "SELECT * FROM products"); err != nil {
+	if err := c.conn.Select(&products, basicQuery); err != nil {
 		return nil, err
 	}
 	return products, nil
@@ -48,7 +56,7 @@ func (c ProductRepository) ByID(ctx context.Context, id int) (*models.Product, e
 }
 
 func (c ProductRepository) Update(ctx context.Context, product *models.Product) error {
-	_, err := c.conn.Exec("UPDATE products SET name = $1 WHERE id = $2", product.Title, product.ID)
+	_, err := c.conn.Exec("UPDATE products SET title = $1 WHERE id = $2", product.Title, product.ID)
 	if err != nil {
 		return err
 	}
